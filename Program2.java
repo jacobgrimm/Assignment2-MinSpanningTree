@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 /**
  * Created by tkalbar on 3/2/19.
@@ -7,6 +8,8 @@ import java.util.Set;
 
 public class Program2 {
     //public ArrayList<ArrayList<node>> adjList;
+    private Integer cols;
+    private Integer rows;
 
     public int constructIntensityGraph(int[][] image){
         int sum =0;
@@ -36,20 +39,118 @@ public class Program2 {
                 adjList.add(row); */
             }
         }
+
         return sum;
     }
 
     public int constructPrunedGraph(int[][] image){
+       /* int sum = 0;
         Graph g = makeGraph(image);
+
         HashSet<Vertex> unVisited = new HashSet<Vertex>();
         HashSet<Vertex> visited = new HashSet<Vertex>();
         for(ArrayList<Vertex> i : g.Nodes) {
             unVisited.addAll(i);
         }
+        Vertex curr = g.Nodes.get(0).get(0);
+        unVisited.remove(curr);
+        visited.add(curr);
+        while(!unVisited.isEmpty()){
+            int min =Integer.MAX_VALUE;
+            Vertex remove = curr;
+          for(int i = 0; i< curr.edges.size(); i++){
+              Edge k = curr.edges.get(i);
+              if(min > k.weight && unVisited.contains(k.second)){
+                  min = k.weight;
+                  remove = k.second;
+              }
+          }
+            visited.add(remove);
+            unVisited.remove(remove);
+            sum += min;
+            curr = remove;
+        }
 
+        return sum; */
+        int sum = 0;
+        HashSet<Integer> unVisited = new HashSet<Integer>();
+        cols = image[0].length;
+        rows = image.length;
+        int total = rows * cols;
 
-        return 0;
+        for(int i=0; i< total; i++){
+            unVisited.add(i);
+        }
+        System.out.println(unVisited.toString());
+
+        Integer curr = 0;
+        unVisited.remove(curr);
+        while(!unVisited.isEmpty()){
+            HashSet<Integer> neighbors = new HashSet<Integer>();
+            boolean change = false;
+            System.out.println(neighbors.toString() + " curr :  " + curr + "  ___________________intensity: " + image[row(curr)][col(curr)]);
+            int minNode = 0;
+            int minVal = Integer.MAX_VALUE;
+            for(Integer i : neighbors){
+                int distance = Math.abs(image[row(curr)][col(curr)] - image[row(i)][col(i)]);
+                if(distance < minVal && unVisited.contains(i)){
+                    minVal = distance;
+                    minNode = i;
+                    change = true;
+                }
+            }
+            if(change) {
+                unVisited.remove(minNode);
+                curr = minNode;
+                sum += minVal;
+            }
+            else{
+                Iterator it = unVisited.iterator();
+                curr = (Integer) it.next();
+               // unVisited.remove(curr);
+            }
+            ArrayList<Integer> m  = new ArrayList<Integer>();
+            for(Integer i : neighbors){
+                if(!unVisited.contains(i)){
+                    m.add(i);
+                }
+            }
+            neighbors.removeAll(m);
+        }
+        return sum;
     }
+
+    private int row (int k){
+        return k / cols;
+    }
+
+    private int col (int k){
+        return k % cols;
+    }
+
+    private ArrayList<Integer> getNeighbors(int k){
+        ArrayList<Integer> mine = new ArrayList<Integer>();
+        if(col(k) > 0 ){
+            mine.add(k-1);
+        }
+        if(col(k)< cols-1) {
+            mine.add(k+1);
+        }
+        if(row(k) > 0){
+            mine.add(k - cols);
+        }
+        if(row(k) < rows -1){
+            mine.add(k+cols);
+        }
+        return mine;
+    }
+
+
+
+
+
+
+
 
     private Graph makeGraph(int[][] image){
         Graph g = new Graph();
